@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title data-i18n="results_title">Results - Translate with Gemini Nano</title>
+  <link rel="stylesheet" href="css/new.min.css">
+</head>
+
+<body style="width: 640px;">
+  <header style="padding-top: 1rem; padding-bottom: 0rem;">
+    <h1 style="font-size: 1.2rem;">
+      <img src="img/icon-128.png" alt="" width="48" height="48" style="vertical-align: middle;">
+      <span data-i18n="results_title">Results - Translate with Gemini Nano</span>
+    </h1>
+  </header>
+
+  <p>
+    <button id="copy" data-i18n="results_button_copy">Copy</button>
+    <span id="status"></span>
+  </p>
+
+  <p id="content" dir="auto"></p>
+
+  <script src="lib/marked.umd.min.js"></script>
+  <script src="results.js"></script>
+</body>
+
+</html>

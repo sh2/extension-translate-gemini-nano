@@ -1,0 +1,41 @@
+{
+    "extension_name": {
+        "message": "Gemini Nanoによる翻訳"
+    },
+    "extension_description": {
+        "message": "ウェブページを翻訳します。バックエンドにGemini Nanoを使用しています。"
+    },
+    "popup_button_run": {
+        "message": "もう一度実行する"
+    },
+    "popup_button_results": {
+        "message": "結果を新しいタブで開く"
+    },
+    "popup_button_options": {
+        "message": "オプションページを開く"
+    },
+    "popup_translating": {
+        "message": "翻訳しています"
+    },
+    "results_title": {
+        "message": "結果 - Gemini Nanoによる翻訳"
+    },
+    "results_button_copy": {
+        "message": "コピーする"
+    },
+    "results_copied": {
+        "message": "コピーしました。"
+    },
+    "options_title": {
+        "message": "オプション - Gemini Nanoによる翻訳"
+    },
+    "options_language": {
+        "message": "以下の言語で翻訳する"
+    },
+    "options_button_save": {
+        "message": "オプションを保存する"
+    },
+    "options_saved": {
+        "message": "保存しました。"
+    }
+}

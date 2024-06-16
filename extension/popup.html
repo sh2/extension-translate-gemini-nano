@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title data-i18n="extension_name">Translate with Gemini Nano</title>
+  <link rel="stylesheet" href="css/new.min.css">
+</head>
+
+<body style="width: 640px;">
+  <header style="padding-top: 1rem; padding-bottom: 0rem;">
+    <h1 style="font-size: 1.2rem;">
+      <img src="img/icon-128.png" alt="" width="48" height="48" style="vertical-align: middle;">
+      <span data-i18n="extension_name">Translate with Gemini Nano</span>
+    </h1>
+  </header>
+
+  <p id="content" dir="auto"></p>
+  <p id="status" style="color: gray;"></p>
+
+  <p>
+    <button id="run" data-i18n="popup_button_run">Run it again</button>
+
+    <select id="languageCode">
+      <option value="en">English</option>
+      <option value="de">Deutsch</option>
+      <option value="es">Español</option>
+      <option value="fr">Français</option>
+      <option value="it">Italiano</option>
+      <option value="pt_br">Português - Brasil</option>
+      <option value="vi">Tiếng Việt</option>
+      <option value="ru">Русский</option>
+      <option value="ar">العربية</option>
+      <option value="hi">हिन्दी</option>
+      <option value="bn">বাংলা</option>
+      <option value="zh_cn">中文 - 简体</option>
+      <option value="zh_tw">中文 - 繁體</option>
+      <option value="ja">日本語</option>
+      <option value="ko">한국어</option>
+    </select>
+
+    <br>
+
+    <button id="results" data-i18n="popup_button_results">Open results in a new tab</button>
+    <button id="options" data-i18n="popup_button_options">Open options page</button>
+  </p>
+
+  <script src="lib/marked.umd.min.js"></script>
+  <script src="popup.js"></script>
+</body>
+
+</html>
