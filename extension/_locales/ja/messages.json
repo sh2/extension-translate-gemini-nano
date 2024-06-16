@@ -14,8 +14,17 @@
     "popup_button_options": {
         "message": "オプションページを開く"
     },
+    "popup_cannot_translate": {
+        "message": "このページは翻訳できません。"
+    },
     "popup_translating": {
         "message": "翻訳しています"
+    },
+    "popup_ai_unavailable": {
+        "message": "このブラウザーではAIが利用できません。"
+    },
+    "popup_request_select": {
+        "message": "翻訳するテキストを選択してください。"
     },
     "results_title": {
         "message": "結果 - Gemini Nanoによる翻訳"

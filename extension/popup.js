@@ -21,6 +21,28 @@ const displayLoadingMessage = (loadingMessage) => {
   }
 };
 
+const getSystemPrompt = (languageCode) => {
+  const languageNames = {
+    en: "English",
+    de: "German",
+    es: "Spanish",
+    fr: "French",
+    it: "Italian",
+    pt_br: "Brazilian Portuguese",
+    vi: "Vietnamese",
+    ru: "Russian",
+    ar: "Arabic",
+    hi: "Hindi",
+    bn: "Bengali",
+    zh_cn: "Simplified Chinese",
+    zh_tw: "Traditional Chinese",
+    ja: "Japanese",
+    ko: "Korean"
+  };
+
+  return `Translate the following text to ${languageNames[languageCode]}`;
+}
+
 const main = async (useCache) => {
   let displayIntervalId = 0;
   let content = "";
@@ -48,7 +70,7 @@ const main = async (useCache) => {
         func: getSelectedText
       }))[0].result;
     } catch {
-      throw new Error("このページは翻訳できません。");
+      throw new Error(chrome.i18n.getMessage("popup_cannot_translate"));
     }
 
     if (taskInput) {
@@ -58,18 +80,44 @@ const main = async (useCache) => {
       // Get the task cache and language code
       const taskCache = (await chrome.storage.session.get({ taskCache: "" })).taskCache;
       const languageCode = document.getElementById("languageCode").value;
+      const systemPrompt = getSystemPrompt(languageCode);
 
       if (useCache && taskCache === JSON.stringify({ taskInput, languageCode })) {
-        // Use the cached response
-        content = (await chrome.storage.session.get({ contentCache: {} })).contentCache;
+        // Use the cached content
+        content = (await chrome.storage.session.get({ contentCache: "" })).contentCache;
       } else {
         // Generate content
-        content = "ここに翻訳結果が表示されます。";
-        const taskData = JSON.stringify({ taskInput, languageCode });
-        await chrome.storage.session.set({ taskCache: taskData, contentCache: content });
+        await chrome.storage.session.set({ taskCache: "", contentCache: "" });
+
+        if (window.ai && (await window.ai.canCreateTextSession()) === "readily") {
+          const session = await window.ai.createTextSession();
+          const stream = await session.promptStreaming(`${systemPrompt}: ${taskInput}`);
+          const div = document.createElement("div");
+          let isFirstChunk = true;
+
+          for await (content of stream) {
+            if (isFirstChunk) {
+              clearInterval(displayIntervalId);
+              document.getElementById("status").textContent = "";
+              isFirstChunk = false;
+            }
+
+            div.textContent = content;
+            document.getElementById("content").innerHTML = marked.parse(div.innerHTML);
+
+            // Scroll to the bottom of the page
+            window.scrollTo(0, document.body.scrollHeight);
+          }
+
+          // Cache the task and content
+          const taskData = JSON.stringify({ taskInput, languageCode });
+          await chrome.storage.session.set({ taskCache: taskData, contentCache: content });
+        } else {
+          content = chrome.i18n.getMessage("popup_ai_unavailable");
+        }
       }
     } else {
-      content = "翻訳したいテキストを選択してください。";
+      content = chrome.i18n.getMessage("popup_request_select");
     }
   } catch (error) {
     content = error.message;
