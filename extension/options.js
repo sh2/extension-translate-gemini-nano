@@ -1,6 +1,6 @@
 const restoreOptions = async () => {
   const options = await chrome.storage.local.get({
-    languageCode: "en",
+    languageCode: "en"
   });
 
   document.getElementById("languageCode").value = options.languageCode;
@@ -8,7 +8,7 @@ const restoreOptions = async () => {
 
 const saveOptions = async () => {
   const options = {
-    languageCode: document.getElementById("languageCode").value,
+    languageCode: document.getElementById("languageCode").value
   };
 
   await chrome.storage.local.set(options);
