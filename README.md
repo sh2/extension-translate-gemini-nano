@@ -11,10 +11,10 @@ To use this extension, please proceed as follows:
 1. Open `chrome://flags`, set the following two flags and restart Chrome.
 
     - Enables optimization guide on device: `Enabled BypassPerfRequirement`
-    - Prompt API for Gemini Nano: `Enabled`
+    - Prompt API for Gemini Nano: `Enabled`  
     ![Flags](img/chrome_flags.png)
 
-2. Open `chrome://components` and wait until the Optimization Guide On Device Model Status becomes `Component already up to date`.
+2. Open `chrome://components` and wait until the Optimization Guide On Device Model Status becomes `Component already up to date`.  
 ![Components](img/chrome_components.png)
 
 For more information, please refer to [Built-in AI | AI on Chrome | Chrome for Developers](https://developer.chrome.com/docs/ai/built-in).
