@@ -2,8 +2,21 @@
 
 Chrome extension to translate web pages. Uses Gemini Nano as the backend.
 
-**Note: This extension is not yet available for Chrome 126 (as of June 2024).**
-It utilizes a built-in AI feature that will be implemented in Chrome in the future.
+## Prerequisites
+
+This extension relies on experimental features of Chrome as of August 2024,
+**It may not work in the future** due to changes in Chrome's functionality.
+To use this extension, please proceed as follows:
+
+1. Open `chrome://flags`, set the following two flags and restart Chrome.
+
+    - Enables optimization guide on device: `Enabled BypassPerfRequirement`
+    - Prompt API for Gemini Nano: `Enabled`
+    ![Flags](img/chrome_flags.png)
+
+2. Open `chrome://components` and wait until the Optimization Guide On Device Model Status becomes `Component already up to date`.
+![Components](img/chrome_components.png)
+
 For more information, please refer to [Built-in AI | AI on Chrome | Chrome for Developers](https://developer.chrome.com/docs/ai/built-in).
 
 ## Setup
