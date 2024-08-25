@@ -3,6 +3,7 @@
 let contentIndex = 0;
 
 const getSelectedText = () => {
+  // Return the selected text
   return window.getSelection().toString();
 };
 
@@ -40,19 +41,17 @@ const getSystemPrompt = (languageCode) => {
     ko: "Korean"
   };
 
-  return `Translate the following text to ${languageNames[languageCode]}`;
-}
+  return `Translate the following text into ${languageNames[languageCode]}.`;
+};
 
 const main = async (useCache) => {
   let displayIntervalId = 0;
   let content = "";
+  contentIndex = (await chrome.storage.session.get({ contentIndex: -1 })).contentIndex;
+  contentIndex = (contentIndex + 1) % 10;
+  await chrome.storage.session.set({ contentIndex: contentIndex });
 
   try {
-    // Increment the content index
-    contentIndex = (await chrome.storage.session.get({ contentIndex: -1 })).contentIndex;
-    contentIndex = (contentIndex + 1) % 10;
-    await chrome.storage.session.set({ contentIndex: contentIndex });
-
     // Clear the content, status, and disable buttons
     document.getElementById("content").textContent = "";
     document.getElementById("status").textContent = "";
@@ -91,7 +90,7 @@ const main = async (useCache) => {
 
         if (window.ai && (await window.ai.canCreateTextSession()) === "readily") {
           const session = await window.ai.createTextSession();
-          const stream = await session.promptStreaming(`${systemPrompt}: ${taskInput}`);
+          const stream = await session.promptStreaming(`${systemPrompt}\nText:\n${taskInput}`);
           const div = document.createElement("div");
           let isFirstChunk = true;
 
@@ -127,16 +126,16 @@ const main = async (useCache) => {
       clearInterval(displayIntervalId);
     }
 
-    // Convert the content from Markdown to HTML
-    const div = document.createElement("div");
-    div.textContent = content;
-    document.getElementById("content").innerHTML = marked.parse(div.innerHTML);
-
     // Clear the status and enable buttons
     document.getElementById("status").textContent = "";
     document.getElementById("run").disabled = false;
     document.getElementById("languageCode").disabled = false;
     document.getElementById("results").disabled = false;
+
+    // Convert the content from Markdown to HTML
+    const div = document.createElement("div");
+    div.textContent = content;
+    document.getElementById("content").innerHTML = marked.parse(div.innerHTML);
 
     // Save the content to the session storage
     await chrome.storage.session.set({ [`c_${contentIndex}`]: content });
