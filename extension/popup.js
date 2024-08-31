@@ -44,6 +44,43 @@ const getSystemPrompt = (languageCode) => {
   return `Translate the following text into ${languageNames[languageCode]}.`;
 };
 
+const checkAICapabilities = async () => {
+  try {
+    if (window.ai?.canCreateTextSession) {
+      // Chrome 127-128
+      if (await window.ai.canCreateTextSession() === "readily") {
+        return true;
+      }
+    }
+
+    if (window.ai?.assistant?.capabilities) {
+      //Chrome 129+
+      if ((await window.ai.assistant.capabilities()).available === "readily") {
+        return true;
+      }
+    }
+
+    return false;
+  } catch (error) {
+    console.error(error);
+    return false;
+  }
+};
+
+const createAISession = async () => {
+  if (window.ai?.createTextSession) {
+    // Chrome 127-128
+    return await window.ai.createTextSession();
+  }
+
+  if (window.ai?.assistant?.create) {
+    // Chrome 129+
+    return await window.ai.assistant.create();
+  }
+
+  return null;
+};
+
 const main = async (useCache) => {
   let displayIntervalId = 0;
   let content = "";
@@ -88,8 +125,8 @@ const main = async (useCache) => {
         // Generate content
         await chrome.storage.session.set({ taskCache: "", contentCache: "" });
 
-        if (window.ai && (await window.ai.canCreateTextSession()) === "readily") {
-          const session = await window.ai.createTextSession();
+        if (await checkAICapabilities()) {
+          const session = await createAISession();
           const stream = await session.promptStreaming(`${systemPrompt}\nText:\n${taskInput}`);
           const div = document.createElement("div");
           let isFirstChunk = true;
