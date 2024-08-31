@@ -157,7 +157,7 @@ const main = async (useCache) => {
     }
   } catch (error) {
     content = error.message;
-    console.log(error);
+    console.error(error);
   } finally {
     if (displayIntervalId) {
       clearInterval(displayIntervalId);
