@@ -54,7 +54,7 @@ const checkAICapabilities = async () => {
     }
 
     if (window.ai?.assistant?.capabilities) {
-      //Chrome 129+
+      // Chrome 129+
       if ((await window.ai.assistant.capabilities()).available === "readily") {
         return true;
       }
