@@ -4,8 +4,14 @@ Chrome extension to translate web pages. Uses Gemini Nano as the backend.
 
 ## Prerequisites
 
-This extension relies on experimental features of Chrome as of August 2024,
-**It may not work in the future** due to changes in Chrome's functionality.
+This extension relies on experimental features of Chrome as of November 2024,
+It may not work in the future due to changes in Chrome's functionality.
+
+Version 2024.9.25.2033 of the Optimization Guide On Device Model
+blocks the operation in languages other than English.
+Therefore, if you are using this version of the Optimization Guide On Device Model,
+this tool will not work as expected.
+
 To use this extension, please proceed as follows:
 
 1. Open `chrome://flags`, set the following two flags and restart Chrome.

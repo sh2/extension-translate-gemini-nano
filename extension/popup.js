@@ -63,8 +63,15 @@ const checkAICapabilities = async () => {
     }
 
     if (window.ai?.assistant?.capabilities) {
-      // Chrome 129+
+      // Chrome 129-130
       if ((await window.ai.assistant.capabilities()).available === "readily") {
+        return true;
+      }
+    }
+
+    if (window.ai?.languageModel?.capabilities) {
+      // Chrome 131-
+      if ((await window.ai.languageModel.capabilities()).available === "readily") {
         return true;
       }
     }
@@ -83,8 +90,13 @@ const createAISession = async () => {
   }
 
   if (window.ai?.assistant?.create) {
-    // Chrome 129+
+    // Chrome 129-130
     return await window.ai.assistant.create();
+  }
+
+  if (window.ai?.languageModel?.create) {
+    // Chrome 131-
+    return await window.ai.languageModel.create();
   }
 
   return null;
