@@ -6,29 +6,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title data-i18n="extension_name">Translate with Gemini Nano</title>
   <link rel="stylesheet" href="css/new.min.css">
-  <style>
-    body {
-      width: 640px;
-    }
-
-    button {
-      margin-bottom: .5rem;
-    }
-
-    body.narrow {
-      width: 84%;
-    }
-
-    body.narrow select,
-    body.narrow button {
-      display: block;
-    }
-  </style>
+  <link rel="stylesheet" href="css/common.css">
 </head>
 
 <body>
   <header style="padding-top: 1rem; padding-bottom: 0rem;">
-    <h1 id="header" style="display: flex; align-items: center; font-size: 1.2rem;">
+    <h1 id="header" style="display: flex; align-items: center;">
       <img src="img/icon-128.png" alt="" width="48" height="48" style="margin-right: .5rem;">
       <span style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" data-i18n="extension_name">
         Translate with Gemini Nano
@@ -40,35 +23,22 @@
   <p id="status" style="color: gray;"></p>
 
   <div>
-    <select id="languageCode">
-      <option value="en">English</option>
-      <option value="de">Deutsch</option>
-      <option value="es">Español</option>
-      <option value="fr">Français</option>
-      <option value="it">Italiano</option>
-      <option value="pt_br">Português - Brasil</option>
-      <option value="vi">Tiếng Việt</option>
-      <option value="ru">Русский</option>
-      <option value="ar">العربية</option>
-      <option value="hi">हिन्दी</option>
-      <option value="bn">বাংলা</option>
-      <option value="zh_cn">中文 - 简体</option>
-      <option value="zh_tw">中文 - 繁體</option>
-      <option value="ja">日本語</option>
-      <option value="ko">한국어</option>
-    </select>
+    <button id="copy" data-i18n="popup_button_copy">Copy</button>
+    <span id="operation-status" style="color: gray;"></span>
+  </div>
 
+  <div>
+    <span id="languageCodeContainer"></span>
     <button id="run" data-i18n="popup_button_run">Run it again</button>
   </div>
 
   <div>
-    <button id="results" data-i18n="popup_button_results">Open results in a new tab</button>
     <button id="options" data-i18n="popup_button_options">Open options page</button>
   </div>
 
   <script src="lib/marked.umd.min.js"></script>
   <script src="lib/purify.min.js"></script>
-  <script src="popup.js"></script>
+  <script type="module" src="popup.js"></script>
 </body>
 
 </html>

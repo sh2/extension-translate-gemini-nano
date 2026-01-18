@@ -1,14 +1,24 @@
-/* globals DOMPurify, marked */
+import {
+  applyTheme,
+  applyFontSize,
+  loadTemplate,
+  displayLoadingMessage,
+  convertMarkdownToHtml
+} from "./utils.js";
 
-let contentIndex = 0;
+let pollingIntervalId = null;
+let content = "";
 
-const checkNarrowScreen = () => {
-  // Add the narrow class if the screen width is narrow
-  if (document.getElementById("header").clientWidth < 640) {
-    document.body.classList.add("narrow");
-  } else {
-    document.body.classList.remove("narrow");
-  }
+const copyContent = async () => {
+  const operationStatus = document.getElementById("operation-status");
+  let clipboardContent = `${content.replace(/\n+$/, "")}\n\n`;
+
+  // Copy the content to the clipboard
+  await navigator.clipboard.writeText(clipboardContent);
+
+  // Display a message indicating that the content was copied
+  operationStatus.textContent = chrome.i18n.getMessage("popup_copied");
+  setTimeout(() => operationStatus.textContent = "", 1000);
 };
 
 const getSelectedText = () => {
@@ -16,106 +26,43 @@ const getSelectedText = () => {
   return window.getSelection().toString();
 };
 
-const displayLoadingMessage = (loadingMessage) => {
-  const status = document.getElementById("status");
+const pollStreamGenerateContent = async () => {
+  // TODO: Error handling including timeout
 
-  switch (status.textContent) {
-    case `${loadingMessage}.`:
-      status.textContent = `${loadingMessage}..`;
-      break;
-    case `${loadingMessage}..`:
-      status.textContent = `${loadingMessage}...`;
-      break;
-    default:
-      status.textContent = `${loadingMessage}.`;
+  // Prevent multiple simultaneous polls
+  if (pollingIntervalId) {
+    clearInterval(pollingIntervalId);
+    pollingIntervalId = null;
   }
-};
 
-const getSystemPrompt = (languageCode) => {
-  const languageNames = {
-    en: "English",
-    de: "German",
-    es: "Spanish",
-    fr: "French",
-    it: "Italian",
-    pt_br: "Brazilian Portuguese",
-    vi: "Vietnamese",
-    ru: "Russian",
-    ar: "Arabic",
-    hi: "Hindi",
-    bn: "Bengali",
-    zh_cn: "Simplified Chinese",
-    zh_tw: "Traditional Chinese",
-    ja: "Japanese",
-    ko: "Korean"
-  };
+  // Start polling
+  await new Promise(resolve => {
+    pollingIntervalId = setInterval(async () => {
+      const status = await chrome.storage.session.get({ stream_1: { status: "idle", content: "" } });
 
-  return `Translate the following text into ${languageNames[languageCode]}.`;
-};
-
-const checkAICapabilities = async () => {
-  try {
-    if (window.ai?.canCreateTextSession) {
-      // Chrome 127-128
-      if (await window.ai.canCreateTextSession() === "readily") {
-        return true;
+      if (status.stream_1.status === "streaming") {
+        document.getElementById("content").innerHTML = convertMarkdownToHtml(status.stream_1.content, false);
+      } else if (status.stream_1.status === "completed") {
+        clearInterval(pollingIntervalId);
+        document.getElementById("content").innerHTML = convertMarkdownToHtml(status.stream_1.content, false);
+        content = status.stream_1.content;
+        pollingIntervalId = null;
+        resolve();
       }
-    }
-
-    if (window.ai?.assistant?.capabilities) {
-      // Chrome 129-130
-      if ((await window.ai.assistant.capabilities()).available === "readily") {
-        return true;
-      }
-    }
-
-    if (window.ai?.languageModel?.capabilities) {
-      // Chrome 131-
-      if ((await window.ai.languageModel.capabilities()).available === "readily") {
-        return true;
-      }
-    }
-
-    return false;
-  } catch (error) {
-    console.error(error);
-    return false;
-  }
-};
-
-const createAISession = async () => {
-  if (window.ai?.createTextSession) {
-    // Chrome 127-128
-    return await window.ai.createTextSession();
-  }
-
-  if (window.ai?.assistant?.create) {
-    // Chrome 129-130
-    return await window.ai.assistant.create();
-  }
-
-  if (window.ai?.languageModel?.create) {
-    // Chrome 131-
-    return await window.ai.languageModel.create();
-  }
-
-  return null;
+    }, 1000);
+  });
 };
 
 const main = async (useCache) => {
   let displayIntervalId = 0;
-  let content = "";
-  contentIndex = (await chrome.storage.session.get({ contentIndex: -1 })).contentIndex;
-  contentIndex = (contentIndex + 1) % 10;
-  await chrome.storage.session.set({ contentIndex: contentIndex });
 
   try {
-    // Clear the content, status, and disable buttons
+    // Disable buttons and clear previous content
     document.getElementById("content").textContent = "";
     document.getElementById("status").textContent = "";
     document.getElementById("run").disabled = true;
     document.getElementById("languageCode").disabled = true;
-    document.getElementById("results").disabled = true;
+    document.getElementById("copy").disabled = true;
 
     // Get the selected text
     const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
@@ -132,12 +79,11 @@ const main = async (useCache) => {
 
     if (taskInput) {
       // Display a loading message
-      displayIntervalId = setInterval(displayLoadingMessage, 500, chrome.i18n.getMessage("popup_translating"));
+      displayIntervalId = setInterval(displayLoadingMessage, 500, "status", chrome.i18n.getMessage("popup_translating"));
 
       // Get the task cache and language code
       const taskCache = (await chrome.storage.session.get({ taskCache: "" })).taskCache;
       const languageCode = document.getElementById("languageCode").value;
-      const systemPrompt = getSystemPrompt(languageCode);
 
       if (useCache && taskCache === JSON.stringify({ taskInput, languageCode })) {
         // Use the cached content
@@ -145,33 +91,20 @@ const main = async (useCache) => {
       } else {
         // Generate content
         await chrome.storage.session.set({ taskCache: "", contentCache: "" });
+        await chrome.storage.session.set({ stream_1: { status: "idle", content: "" } });
 
-        if (await checkAICapabilities()) {
-          const session = await createAISession();
-          const stream = await session.promptStreaming(`${systemPrompt}\nText:\n${taskInput}`);
-          const div = document.createElement("div");
-          let isFirstChunk = true;
+        chrome.runtime.sendMessage({
+          action: "startTranslation",
+          taskInput,
+          languageCode
+        });
 
-          for await (content of stream) {
-            if (isFirstChunk) {
-              clearInterval(displayIntervalId);
-              document.getElementById("status").textContent = "";
-              isFirstChunk = false;
-            }
+        // Poll for results
+        await pollStreamGenerateContent();
 
-            div.textContent = content;
-            document.getElementById("content").innerHTML = DOMPurify.sanitize(marked.parse(div.innerHTML));
-
-            // Scroll to the bottom of the page
-            window.scrollTo(0, document.body.scrollHeight);
-          }
-
-          // Cache the task and content
-          const taskData = JSON.stringify({ taskInput, languageCode });
-          await chrome.storage.session.set({ taskCache: taskData, contentCache: content });
-        } else {
-          content = chrome.i18n.getMessage("popup_ai_unavailable");
-        }
+        // Cache the task and content
+        const taskData = JSON.stringify({ taskInput, languageCode });
+        await chrome.storage.session.set({ taskCache: taskData, contentCache: content });
       }
     } else {
       content = chrome.i18n.getMessage("popup_request_select");
@@ -184,28 +117,27 @@ const main = async (useCache) => {
       clearInterval(displayIntervalId);
     }
 
-    // Clear the status and enable buttons
+    // Convert the content from Markdown to HTML
+    document.getElementById("content").innerHTML = convertMarkdownToHtml(content, false);
+
+    // Enable buttons and clear status
     document.getElementById("status").textContent = "";
     document.getElementById("run").disabled = false;
     document.getElementById("languageCode").disabled = false;
-    document.getElementById("results").disabled = false;
-
-    // Convert the content from Markdown to HTML
-    const div = document.createElement("div");
-    div.textContent = content;
-    document.getElementById("content").innerHTML = DOMPurify.sanitize(marked.parse(div.innerHTML));
-
-    // Save the content to the session storage
-    await chrome.storage.session.set({ [`c_${contentIndex}`]: content });
+    document.getElementById("copy").disabled = false;
   }
 };
 
 const initialize = async () => {
-  // Check if the screen is narrow
-  checkNarrowScreen();
+  // Apply the theme
+  applyTheme((await chrome.storage.local.get({ theme: "system" })).theme);
 
-  // Disable links when converting from Markdown to HTML
-  marked.use({ renderer: { link: ({ text }) => text } });
+  // Apply font size
+  applyFontSize((await chrome.storage.local.get({ fontSize: "medium" })).fontSize);
+
+  // Load the language code template
+  const languageCodeTemplate = await loadTemplate("languageCodeTemplate");
+  document.getElementById("languageCodeContainer").appendChild(languageCodeTemplate);
 
   // Set the text direction of the body
   document.body.setAttribute("dir", chrome.i18n.getMessage("@@bidi_dir"));
@@ -228,16 +160,10 @@ document.getElementById("run").addEventListener("click", () => {
   main(false);
 });
 
-document.getElementById("results").addEventListener("click", () => {
-  chrome.tabs.create({ url: chrome.runtime.getURL(`results.html?i=${contentIndex}`) }, () => {
-    window.close();
-  });
-});
+document.getElementById("copy").addEventListener("click", copyContent);
 
 document.getElementById("options").addEventListener("click", () => {
   chrome.runtime.openOptionsPage(() => {
     window.close();
   });
 });
-
-window.addEventListener("resize", checkNarrowScreen);

@@ -6,24 +6,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title data-i18n="options_title">Options - Translate with Gemini Nano</title>
   <link rel="stylesheet" href="css/new.min.css">
-  <style>
-    body {
-      width: 640px;
-    }
-
-    button {
-      margin-bottom: .5rem;
-    }
-
-    body.narrow {
-      width: 84%;
-    }
-  </style>
+  <link rel="stylesheet" href="css/common.css">
 </head>
 
 <body>
   <header style="padding-top: 1rem; padding-bottom: 0rem;">
-    <h1 id="header" style="display: flex; align-items: center; font-size: 1.2rem;">
+    <h1 id="header" style="display: flex; align-items: center;">
       <img src="img/icon-128.png" alt="" width="48" height="48" style="margin-right: .5rem;">
       <span style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" data-i18n="options_title">
         Options - Translate with Gemini Nano
@@ -34,31 +22,39 @@
   <p>
     <label for="languageCode" data-i18n="options_language">Translate to</label>
     <br>
-    <select id="languageCode">
-      <option value="en">English</option>
-      <option value="de">Deutsch</option>
-      <option value="es">Español</option>
-      <option value="fr">Français</option>
-      <option value="it">Italiano</option>
-      <option value="pt_br">Português - Brasil</option>
-      <option value="vi">Tiếng Việt</option>
-      <option value="ru">Русский</option>
-      <option value="ar">العربية</option>
-      <option value="hi">हिन्दी</option>
-      <option value="bn">বাংলা</option>
-      <option value="zh_cn">中文 - 简体</option>
-      <option value="zh_tw">中文 - 繁體</option>
-      <option value="ja">日本語</option>
-      <option value="ko">한국어</option>
+    <span id="languageCodeContainer"></span>
+  </p>
+
+  <hr>
+
+  <p>
+    <span data-i18n="options_theme">Theme</span>
+    <br>
+    <select id="theme">
+      <option value="system">System</option>
+      <option value="light">Light</option>
+      <option value="dark">Dark</option>
+    </select>
+  </p>
+
+  <hr>
+
+  <p>
+    <span data-i18n="options_font_size">Font Size</span>
+    <br>
+    <select id="fontSize">
+      <option value="large">Large</option>
+      <option value="medium">Medium</option>
+      <option value="small">Small</option>
     </select>
   </p>
 
   <p>
     <button id="save" data-i18n="options_button_save">Save options</button>
-    <span id="status"></span>
+    <span id="status" style="color: gray;"></span>
   </p>
 
-  <script src="options.js"></script>
+  <script type="module" src="options.js"></script>
 </body>
 
 </html>

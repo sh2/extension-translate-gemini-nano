@@ -11,6 +11,10 @@
   "action": {
     "default_popup": "popup.html"
   },
+  "background": {
+    "service_worker": "service-worker.js",
+    "type": "module"
+  },
   "options_page": "options.html",
   "permissions": [
     "activeTab",

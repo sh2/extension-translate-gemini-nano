@@ -1,0 +1,69 @@
+body {
+  width: 640px;
+}
+
+button {
+  margin-bottom: .5rem;
+}
+
+body[data-theme="light"] {
+  --nc-tx-1: #000000;
+  --nc-tx-2: #1A1A1A;
+  --nc-bg-1: #FFFFFF;
+  --nc-bg-2: #F6F8FA;
+  --nc-bg-3: #E5E7EB;
+  --nc-lk-1: #0070F3;
+  --nc-lk-2: #0366D6;
+  --nc-lk-tx: #FFFFFF;
+  --nc-ac-1: #79FFE1;
+  --nc-ac-tx: #0C4047;
+}
+
+body[data-theme="dark"] {
+  --nc-tx-1: #FFFFFF;
+  --nc-tx-2: #EEEEEE;
+  --nc-bg-1: #000000;
+  --nc-bg-2: #111111;
+  --nc-bg-3: #222222;
+  --nc-lk-1: #3291FF;
+  --nc-lk-2: #0070F3;
+  --nc-lk-tx: #FFFFFF;
+  --nc-ac-1: #7928CA;
+  --nc-ac-tx: #FFFFFF;
+}
+
+body[data-font-size="large"] {
+  font-size: larger;
+
+  button,
+  select,
+  input,
+  textarea {
+    font-size: larger;
+  }
+
+  h1 {
+    font-size: 1.4rem;
+  }
+}
+
+body[data-font-size="medium"] {
+  h1 {
+    font-size: 1.2rem;
+  }
+}
+
+body[data-font-size="small"] {
+  font-size: smaller;
+
+  button,
+  select,
+  input,
+  textarea {
+    font-size: smaller;
+  }
+
+  h1 {
+    font-size: 1rem;
+  }
+}
