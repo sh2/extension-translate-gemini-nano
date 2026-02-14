@@ -6,7 +6,6 @@ import {
   convertMarkdownToHtml
 } from "./utils.js";
 
-let pollingIntervalId = null;
 let content = "";
 
 const copyContent = async () => {
@@ -26,31 +25,52 @@ const getSelectedText = () => {
   return window.getSelection().toString();
 };
 
-const pollStreamGenerateContent = async () => {
-  // TODO: Error handling including timeout
+const getSystemPrompt = (languageCode) => {
+  const languageNames = {
+    en: "English",
+    de: "German",
+    es: "Spanish",
+    fr: "French",
+    it: "Italian",
+    pt_br: "Brazilian Portuguese",
+    vi: "Vietnamese",
+    ru: "Russian",
+    ar: "Arabic",
+    hi: "Hindi",
+    bn: "Bengali",
+    zh_cn: "Simplified Chinese",
+    zh_tw: "Traditional Chinese",
+    ja: "Japanese",
+    ko: "Korean"
+  };
 
-  // Prevent multiple simultaneous polls
-  if (pollingIntervalId) {
-    clearInterval(pollingIntervalId);
-    pollingIntervalId = null;
+  return `Translate the image into ${languageNames[languageCode]} ` +
+    "and reply only with the translated result.";
+};
+
+const streamGenerateContent = async (taskInput, languageCode) => {
+  const contentElement = document.getElementById("content");
+  const session = await self.LanguageModel.create();
+
+  const stream = await session.promptStreaming([
+    {
+      role: "system",
+      content: getSystemPrompt(languageCode)
+    },
+    {
+      role: "user",
+      content: taskInput
+    }
+  ]);
+
+  let result = "";
+
+  for await (const chunk of stream) {
+    result += chunk;
+    contentElement.innerHTML = convertMarkdownToHtml(result, false);
   }
 
-  // Start polling
-  await new Promise(resolve => {
-    pollingIntervalId = setInterval(async () => {
-      const status = await chrome.storage.session.get({ stream_1: { status: "idle", content: "" } });
-
-      if (status.stream_1.status === "streaming") {
-        document.getElementById("content").innerHTML = convertMarkdownToHtml(status.stream_1.content, false);
-      } else if (status.stream_1.status === "completed") {
-        clearInterval(pollingIntervalId);
-        document.getElementById("content").innerHTML = convertMarkdownToHtml(status.stream_1.content, false);
-        content = status.stream_1.content;
-        pollingIntervalId = null;
-        resolve();
-      }
-    }, 1000);
-  });
+  return result;
 };
 
 const main = async (useCache) => {
@@ -73,14 +93,11 @@ const main = async (useCache) => {
         target: { tabId: tab.id },
         func: getSelectedText
       }))[0].result;
-    } catch {
-      throw new Error(chrome.i18n.getMessage("popup_cannot_translate"));
+    } catch (error) {
+      throw new Error(chrome.i18n.getMessage("popup_error_injection_blocked"), { cause: error });
     }
 
     if (taskInput) {
-      // Display a loading message
-      displayIntervalId = setInterval(displayLoadingMessage, 500, "status", chrome.i18n.getMessage("popup_translating"));
-
       // Get the task cache and language code
       const taskCache = (await chrome.storage.session.get({ taskCache: "" })).taskCache;
       const languageCode = document.getElementById("languageCode").value;
@@ -91,27 +108,23 @@ const main = async (useCache) => {
       } else {
         // Generate content
         await chrome.storage.session.set({ taskCache: "", contentCache: "" });
-        await chrome.storage.session.set({ stream_1: { status: "idle", content: "" } });
 
-        chrome.runtime.sendMessage({
-          action: "startTranslation",
-          taskInput,
-          languageCode
-        });
-
-        // Poll for results
-        await pollStreamGenerateContent();
+        // Display a loading message while generating content
+        displayIntervalId = setInterval(displayLoadingMessage, 500, "status", chrome.i18n.getMessage("popup_translating"));
+        content = await streamGenerateContent(taskInput, languageCode);
+        clearInterval(displayIntervalId);
+        displayIntervalId = 0;
 
         // Cache the task and content
         const taskData = JSON.stringify({ taskInput, languageCode });
         await chrome.storage.session.set({ taskCache: taskData, contentCache: content });
       }
     } else {
-      content = chrome.i18n.getMessage("popup_request_select");
+      content = chrome.i18n.getMessage("popup_error_no_selection");
     }
   } catch (error) {
     content = error.message;
-    console.error(error);
+    console.log(error);
   } finally {
     if (displayIntervalId) {
       clearInterval(displayIntervalId);

@@ -3,7 +3,7 @@
         "message": "Translate with Gemini Nano"
     },
     "extension_description": {
-        "message": "Translate web pages. Uses Gemini Nano as the backend."
+        "message": "Privacy-focused extension to translate web pages locally using Gemini Nano."
     },
     "popup_button_copy": {
         "message": "Copy"
@@ -12,22 +12,19 @@
         "message": "Copied."
     },
     "popup_button_run": {
-        "message": "Run it again"
+        "message": "Run again"
     },
     "popup_button_options": {
         "message": "Open options page"
     },
-    "popup_cannot_translate": {
-        "message": "This page cannot be translated."
-    },
     "popup_translating": {
         "message": "Translating"
     },
-    "popup_ai_unavailable": {
-        "message": "AI is not available in this browser."
+    "popup_error_injection_blocked": {
+        "message": "Unable to translate this page."
     },
-    "popup_request_select": {
-        "message": "Select the text to be translated."
+    "popup_error_no_selection": {
+        "message": "Please select text to translate."
     },
     "options_title": {
         "message": "Options - Translate with Gemini Nano"
@@ -39,12 +36,12 @@
         "message": "Theme"
     },
     "options_font_size": {
-        "message": "Font size"
+        "message": "Font Size"
     },
     "options_button_save": {
         "message": "Save options"
     },
     "options_saved": {
-        "message": "Saved."
+        "message": "Options saved."
     }
 }
