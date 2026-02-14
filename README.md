@@ -1,34 +1,31 @@
-# extension-translate-gemini-nano
+# Translate with Gemini Nano
 
-Chrome extension to translate web pages. Uses Gemini Nano as the backend.
+Chrome extension to translate web pages using Chrome's built-in Gemini Nano via the Prompt API.
+
+## ⚠️ Important Note
+
+**This extension uses the generic Prompt API to implement translation functionality. However, Chrome now provides a dedicated [Translator API](https://developer.chrome.com/docs/ai/translator-api) that is specifically optimized for translation tasks and consumes significantly fewer resources.**
+
+**For new projects, I strongly recommend using the Translator API instead.** I have created [NanoGlot](https://github.com/sh2/extension-nanoglot), a translation extension that leverages the Translator API.
+
+This extension remains available as a demonstration of what can be achieved with the more general-purpose Prompt API.
 
 ## Prerequisites
 
-This extension relies on experimental features of Chrome as of November 2024,
-It may not work in the future due to changes in Chrome's functionality.
+As of Chrome 138, the Prompt API is **Generally Available (GA)**. No special flags or configuration are required.
 
-Version 2024.9.25.2033 of the Optimization Guide On Device Model
-blocks the operation in languages other than English.
-Therefore, if you are using this version of the Optimization Guide On Device Model,
-this tool will not work as expected.
+Simply ensure:
 
-To use this extension, please proceed as follows:
+- You are using **Chrome 138 or later**
+- The Gemini Nano model is downloaded automatically when first used
 
-1. Open `chrome://flags`, set the following two flags and restart Chrome.
+For the latest status, see [Built-in AI on Chrome](https://developer.chrome.com/docs/ai/built-in-apis).
 
-    - Enables optimization guide on device: `Enabled BypassPerfRequirement`
-    - Prompt API for Gemini Nano: `Enabled`  
-    ![Flags](img/chrome_flags.png)
-
-2. Open `chrome://components` and wait until the Optimization Guide On Device Model Status becomes `Component already up to date`.  
-![Components](img/chrome_components.png)
-
-For more information, please refer to [Built-in AI | AI on Chrome | Chrome for Developers](https://developer.chrome.com/docs/ai/built-in).
+For detailed API documentation, see [Prompt API for Gemini Nano](https://developer.chrome.com/docs/ai/prompt-api).
 
 ## Setup
 
-This extension can be installed from [Chrome Web Store](https://chromewebstore.google.com/detail/nffemijelmgmjapkgomeahmmpbcjjpnn).
-The following are instructions for manual installation, for development purposes.
+To install this extension manually:
 
 1. Open 'Manage Extensions' page in Google Chrome browser.
 2. Enable 'Developer mode'.
@@ -44,4 +41,4 @@ Select the text you want to translate and click on the extension icon.
 ## License
 
 MIT License  
-Copyright (c) 2024 Sadao Hiratsuka
+Copyright (c) 2024-2026 Sadao Hiratsuka
