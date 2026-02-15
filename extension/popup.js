@@ -28,29 +28,22 @@ const getSelectedText = () => {
 const getSystemPrompt = (languageCode) => {
   const languageNames = {
     en: "English",
-    de: "German",
     es: "Spanish",
-    fr: "French",
-    it: "Italian",
-    pt_br: "Brazilian Portuguese",
-    vi: "Vietnamese",
-    ru: "Russian",
-    ar: "Arabic",
-    hi: "Hindi",
-    bn: "Bengali",
-    zh_cn: "Simplified Chinese",
-    zh_tw: "Traditional Chinese",
-    ja: "Japanese",
-    ko: "Korean"
+    ja: "Japanese"
   };
 
-  return `Translate the image into ${languageNames[languageCode]} ` +
+  return `Translate the entire text into ${languageNames[languageCode]} ` +
     "and reply only with the translated result.";
 };
 
 const streamGenerateContent = async (taskInput, languageCode) => {
   const contentElement = document.getElementById("content");
-  const session = await self.LanguageModel.create();
+  
+  const session = await self.LanguageModel.create({
+    expectedOutputs: [
+      { type: "text", languages: [languageCode] }
+    ]
+  });
 
   const stream = await session.promptStreaming([
     {
