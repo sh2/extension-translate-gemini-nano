@@ -38,7 +38,7 @@ const getSystemPrompt = (languageCode) => {
 
 const streamGenerateContent = async (taskInput, languageCode) => {
   const contentElement = document.getElementById("content");
-  
+
   const session = await self.LanguageModel.create({
     expectedOutputs: [
       { type: "text", languages: [languageCode] }
@@ -119,9 +119,8 @@ const main = async (useCache) => {
     content = error.message;
     console.log(error);
   } finally {
-    if (displayIntervalId) {
-      clearInterval(displayIntervalId);
-    }
+    // Stop displaying the loading message if it's still being displayed
+    clearInterval(displayIntervalId);
 
     // Convert the content from Markdown to HTML
     document.getElementById("content").innerHTML = convertMarkdownToHtml(content, false);
